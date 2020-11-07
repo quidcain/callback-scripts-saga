@@ -5,6 +5,7 @@ const app = express();
 const port = 3500;
 
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../../frontend')));
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

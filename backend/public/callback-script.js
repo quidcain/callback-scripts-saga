@@ -18,4 +18,7 @@ var recsData = [
   }
 ];
 
-window.PeeriusCallbacks.smartRecs(recsData);
+var PeeriusCallbacks = window.PeeriusCallbacks;
+if (PeeriusCallbacks) {
+  PeeriusCallbacks.smartRecs(recsData);
+}
