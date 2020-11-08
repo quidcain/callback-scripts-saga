@@ -1,4 +1,14 @@
-import { all, take, call, fork, spawn, cancel } from 'redux-saga/effects';
+import {
+  all,
+  take,
+  call,
+  fork,
+  spawn,
+  cancel,
+  put,
+  takeEvery,
+  select,
+} from 'redux-saga/effects';
 import * as api from './api';
 
 function* mainWatcher() {
@@ -21,12 +31,7 @@ function* callbacksWorker(effectCreatorName) {
   }[effectCreatorName];
   const effectA = yield effectCreator(getDataA);
   const effectB = yield effectCreator(getDataB);
-  window.effects = (window.effects || []).concat([effectA, effectB]);
-  window.effects.forEach(effect => {
-    console.log(
-      `effect.id == ${effect.id}; effect.isRunning == ${effect.isRunning()}`,
-    );
-  });
+  yield put({ type: 'UPDATE_EFFECTS', payload: [effectA, effectB] });
 }
 
 function* getDataA() {
@@ -39,6 +44,15 @@ function* getDataB() {
   console.log('dataB', data);
 }
 
+function* logEffects() {
+  const effects = yield select(state => state.effects);
+  effects.forEach(effect => {
+    console.log(
+      `effect.id == ${effect.id}; effect.isRunning == ${effect.isRunning()}`,
+    );
+  });
+}
+
 export default function* () {
-  yield all([call(mainWatcher)]);
+  yield all([call(mainWatcher), takeEvery('UPDATE_EFFECTS', logEffects)]);
 }
