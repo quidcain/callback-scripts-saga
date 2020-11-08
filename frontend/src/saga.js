@@ -2,16 +2,9 @@ import { all, take, call, fork, spawn, cancel } from 'redux-saga/effects';
 import * as api from './api';
 
 function* mainWatcher() {
-  const dataAPromise = api.getDataA();
-  const dataBPromise = api.getDataB();
   let { effectCreatorName } = yield take('RUN');
   while (true) {
-    const callbacksWorkerTask = yield fork(
-      callbacksWorker,
-      effectCreatorName,
-      dataAPromise,
-      dataBPromise,
-    );
+    const callbacksWorkerTask = yield fork(callbacksWorker, effectCreatorName);
     const removeCallbackScript = api.loadScript(
       'http://localhost:3500/callback-script.js',
     );
@@ -21,22 +14,28 @@ function* mainWatcher() {
   }
 }
 
-function* callbacksWorker(effectCreatorName, dataAPromise, dataBPromise) {
+function* callbacksWorker(effectCreatorName) {
   let effectCreator = {
     fork,
     spawn,
   }[effectCreatorName];
-  yield effectCreator(getDataA, dataAPromise);
-  yield effectCreator(getDataB, dataBPromise);
+  const effectA = yield effectCreator(getDataA);
+  const effectB = yield effectCreator(getDataB);
+  window.effects = (window.effects || []).concat([effectA, effectB]);
+  window.effects.forEach(effect => {
+    console.log(
+      `effect.id == ${effect.id}; effect.isRunning == ${effect.isRunning()}`,
+    );
+  });
 }
 
-function* getDataA(dataPromise) {
-  const data = yield dataPromise;
+function* getDataA() {
+  const data = yield call(api.getDataA);
   console.log('dataA', data);
 }
 
-function* getDataB(dataPromise) {
-  const data = yield dataPromise;
+function* getDataB() {
+  const data = yield call(api.getDataB);
   console.log('dataB', data);
 }
 
