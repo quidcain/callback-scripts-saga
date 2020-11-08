@@ -4,25 +4,30 @@ import * as api from './api';
 function* mainWatcher() {
   const dataAPromise = api.getDataA();
   const dataBPromise = api.getDataB();
-  yield take('RUN');
+  let { effectCreatorName } = yield take('RUN');
   while (true) {
     const callbacksWorkerTask = yield fork(
       callbacksWorker,
+      effectCreatorName,
       dataAPromise,
       dataBPromise,
     );
     const removeCallbackScript = api.loadScript(
       'http://localhost:3500/callback-script.js',
     );
-    yield take('RUN');
+    ({ effectCreatorName } = yield take('RUN'));
     yield cancel(callbacksWorkerTask);
     removeCallbackScript();
   }
 }
 
-function* callbacksWorker(dataAPromise, dataBPromise) {
-  yield fork(getDataA, dataAPromise);
-  yield fork(getDataB, dataBPromise);
+function* callbacksWorker(effectCreatorName, dataAPromise, dataBPromise) {
+  let effectCreator = {
+    fork,
+    spawn,
+  }[effectCreatorName];
+  yield effectCreator(getDataA, dataAPromise);
+  yield effectCreator(getDataB, dataBPromise);
 }
 
 function* getDataA(dataPromise) {
