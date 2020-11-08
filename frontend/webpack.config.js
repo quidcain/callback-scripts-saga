@@ -8,6 +8,10 @@ module.exports = {
     filename: 'main.js',
     path: path.resolve(__dirname, 'assets/dist'),
   },
+  devtool: 'source-map',
+  optimization: {
+    minimize: false,
+  },
   module: {
     rules: [
       {
