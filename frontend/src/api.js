@@ -11,4 +11,15 @@ const removeScript = src => {
   );
 };
 
-export { loadScript, removeScript };
+const getDataA = () => {
+  return new Promise(resolve => {
+    if (!window.CallbacksApi) {
+      window.CallbacksApi = {};
+    }
+    window.CallbacksApi.dataA = dataA => {
+      resolve(dataA);
+    };
+  });
+};
+
+export { loadScript, removeScript, getDataA };

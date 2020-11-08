@@ -21,7 +21,9 @@ var recsData = [
   },
 ];
 
-var PeeriusCallbacks = window.PeeriusCallbacks;
-if (PeeriusCallbacks) {
-  PeeriusCallbacks.smartRecs(recsData);
+var CallbacksApi = window.CallbacksApi;
+if (CallbacksApi) {
+  setTimeout(() => {
+    CallbacksApi.dataA(recsData);
+  }, 5000);
 }

@@ -6,14 +6,8 @@ import saga from './saga';
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(state => state, applyMiddleware(sagaMiddleware));
 sagaMiddleware.run(saga);
-store.dispatch({
-  type: 'HELLO',
-  text: 'hello',
-});
 
-const removeCallbackScript = loadScript(
-  'http://localhost:3500/callback-script.js',
-);
-setTimeout(() => {
-  removeCallbackScript();
-}, 5000);
+const runButton = document.getElementById('run');
+runButton.addEventListener('click', () => {
+  store.dispatch({ type: 'RUN' });
+});
