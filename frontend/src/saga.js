@@ -3,9 +3,14 @@ import * as api from './api';
 
 function* mainWatcher() {
   const dataAPromise = api.getDataA();
+  const dataBPromise = api.getDataB();
   yield take('RUN');
   while (true) {
-    const callbacksWorkerTask = yield fork(callbacksWorker, dataAPromise);
+    const callbacksWorkerTask = yield fork(
+      callbacksWorker,
+      dataAPromise,
+      dataBPromise,
+    );
     const removeCallbackScript = api.loadScript(
       'http://localhost:3500/callback-script.js',
     );
@@ -15,13 +20,19 @@ function* mainWatcher() {
   }
 }
 
-function* callbacksWorker(dataAPromise) {
-  yield spawn(getDataA, dataAPromise);
+function* callbacksWorker(dataAPromise, dataBPromise) {
+  yield fork(getDataA, dataAPromise);
+  yield fork(getDataB, dataBPromise);
 }
 
 function* getDataA(dataPromise) {
   const data = yield dataPromise;
   console.log('dataA', data);
+}
+
+function* getDataB(dataPromise) {
+  const data = yield dataPromise;
+  console.log('dataB', data);
 }
 
 export default function* () {

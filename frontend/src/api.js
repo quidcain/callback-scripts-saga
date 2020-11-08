@@ -22,4 +22,15 @@ const getDataA = () => {
   });
 };
 
-export { loadScript, removeScript, getDataA };
+const getDataB = () => {
+  return new Promise(resolve => {
+    if (!window.CallbacksApi) {
+      window.CallbacksApi = {};
+    }
+    window.CallbacksApi.dataB = dataB => {
+      resolve(dataB);
+    };
+  });
+};
+
+export { loadScript, removeScript, getDataA, getDataB };
