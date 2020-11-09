@@ -15,3 +15,25 @@ const runSpawnButton = document.getElementById('run-spawn');
 runSpawnButton.addEventListener('click', () => {
   store.dispatch({ type: 'RUN', effectCreatorName: 'spawn' });
 });
+const tasksTable = document.getElementById('tasks');
+store.subscribe(() => {
+  const headers = `
+    <tr>
+      <th>task.id</th>
+      <th>task.isRunnning()</th>
+    </tr>
+  `;
+  const rows = store.getState().tasks.reduce((acc, curr) => {
+    return (
+      acc +
+      `
+        <tr>
+          <td>${curr.id}</td>
+          <td>${curr.isRunning()}</td>
+        </tr>
+      `
+    );
+  }, '');
+  tasksTable.innerHTML = headers + rows;
+});
+window.store = store;

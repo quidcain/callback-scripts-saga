@@ -1,13 +1,15 @@
 const initialState = {
-  effects: [],
+  tasks: [],
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'UPDATE_EFFECTS':
+    case 'UPDATE_TASKS':
       return {
         ...state,
-        effects: state.effects.concat(action.payload),
+        ...(action.payload
+          ? { tasks: state.tasks.concat(action.payload) }
+          : {}),
       };
     default:
       return state;

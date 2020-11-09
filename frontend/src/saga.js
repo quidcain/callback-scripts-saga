@@ -8,6 +8,7 @@ import {
   put,
   takeEvery,
   select,
+  join,
 } from 'redux-saga/effects';
 import * as api from './api';
 
@@ -29,30 +30,34 @@ function* callbacksWorker(effectCreatorName) {
     fork,
     spawn,
   }[effectCreatorName];
-  const effectA = yield effectCreator(getDataA);
-  const effectB = yield effectCreator(getDataB);
-  yield put({ type: 'UPDATE_EFFECTS', payload: [effectA, effectB] });
+  const taskA = yield effectCreator(getDataA);
+  const taskB = yield effectCreator(getDataB);
+  yield put({ type: 'UPDATE_TASKS', payload: [taskA, taskB] });
+  yield join([taskA, taskB]);
+  yield put({ type: 'UPDATE_TASKS' });
 }
 
 function* getDataA() {
   const data = yield call(api.getDataA);
   console.log('dataA', data);
+  yield put({ type: 'UPDATE_TASKS' });
 }
 
 function* getDataB() {
   const data = yield call(api.getDataB);
   console.log('dataB', data);
+  yield put({ type: 'UPDATE_TASKS' });
 }
 
-function* logEffects() {
-  const effects = yield select(state => state.effects);
-  effects.forEach(effect => {
+function* logTasks() {
+  const tasks = yield select(state => state.tasks);
+  tasks.forEach(task => {
     console.log(
-      `effect.id == ${effect.id}; effect.isRunning == ${effect.isRunning()}`,
+      `tasks.id == ${task.id}; tasks.isRunning == ${task.isRunning()}`,
     );
   });
 }
 
 export default function* () {
-  yield all([call(mainWatcher), takeEvery('UPDATE_EFFECTS', logEffects)]);
+  yield all([call(mainWatcher), takeEvery('UPDATE_TASKS', logTasks)]);
 }
