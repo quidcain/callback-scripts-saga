@@ -1,7 +1,6 @@
-const webpack = require('webpack');
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export default {
   entry: './src/index.js',
   output: {
     filename: 'main.js',
