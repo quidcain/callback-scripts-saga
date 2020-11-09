@@ -6,8 +6,6 @@ import {
   spawn,
   cancel,
   put,
-  takeEvery,
-  select,
   join,
 } from 'redux-saga/effects';
 import * as api from './api';
@@ -49,15 +47,6 @@ function* getDataB() {
   yield put({ type: 'UPDATE_TASKS' });
 }
 
-function* logTasks() {
-  const tasks = yield select(state => state.tasks);
-  tasks.forEach(task => {
-    console.log(
-      `tasks.id == ${task.id}; tasks.isRunning == ${task.isRunning()}`,
-    );
-  });
-}
-
 export default function* () {
-  yield all([call(mainWatcher), takeEvery('UPDATE_TASKS', logTasks)]);
+  yield all([call(mainWatcher)]);
 }
